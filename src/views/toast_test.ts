@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import {DataHelper} from '../controllers/db/dataHelper';
 
-export function showToast() 
+export function showToast(info : string) 
 {
-    
-    vscode.window.showInformationMessage('Connection status: ' + DataHelper.connectedStatus);
+
+    vscode.window.showInformationMessage(info);
 }
