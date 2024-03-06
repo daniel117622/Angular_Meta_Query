@@ -1,36 +1,27 @@
-import { ConnectionPool } from 'mssql';
+import { MongoClient } from 'mongodb';
 
-class DataHelper
-{
-    private dbConfig = 
-      {
-        user: 'root',
-        password: 'root',
-        server: 'localhost:5050', 
-        database: 'desarrollo',
-        options: 
-        {
-          encrypt: true, 
-          trustServerCertificate: true 
-        }
-      };
 
-      private pool: ConnectionPool;
-
-      constructor() 
-      {
-        this.pool = new ConnectionPool(this.dbConfig);
-        this.connect();
-      }
-
-      private async connect() 
-      {
-        try 
-        {
-          await this.pool.connect();
-          console.log('Connected to the MSSQL database successfully');
-        } catch (error) { console.error('Failed to connect to the database:', error); }
-      }
+export class DataHelper
+{    
+    
+    public static connectedStatus: boolean = false;
+    private client: MongoClient;  
+    
+    constructor(env_uri : string) 
+    {
+      this.client = new MongoClient(env_uri);
+      this.connect();
     }
 
-export default DataHelper;
+    private connect(): void {
+      this.client.connect().then(() => {
+          console.log('Connected to the MongoDB database successfully');
+          DataHelper.connectedStatus = true;
+      }).catch((error) => {
+          console.error('Failed to connect to the database:', error);
+      });
+    }
+
+}
+  
+
