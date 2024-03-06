@@ -1,5 +1,7 @@
 import { StyleAssociation, StyleObject } from "../../models/StyleAssociation";
-import { promises as fs, read } from 'fs';
+import { WorkspaceFolder, workspace } from "vscode";
+import * as path from 'path';
+import * as fs from 'fs';
 
 interface ICommand 
 {
@@ -10,7 +12,7 @@ export class StyleParserCommand implements ICommand
 {
     private result? : StyleAssociation[];
     private fileToParse?: string;
-
+    private fileContents?: string;
 
     constructor(private filePath: string) 
     {
@@ -21,35 +23,52 @@ export class StyleParserCommand implements ICommand
     {
         return new Promise<StyleAssociation[]>((resolve, reject) => 
         {
-            this.read_file(this.fileToParse || 'no file')
-                .then(() => {
-                    this.result = [
-                        { element: "p" , tags: [{ key: "height", value: "5px" }] },
-                        { element: "button", tags: [{ key: "color", value: "red" }]}
-                    ];
-                    resolve(this.result); 
+            let active_folder: WorkspaceFolder | undefined = workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined;
+            if (active_folder)
+            {
+                let resolvedPath = path.resolve(active_folder.uri.fsPath);
+                this.read_file(resolvedPath || 'no file')
+                .then(() => 
+                {
+                    let text_file : string;
+                    if (!fs.existsSync(resolvedPath)) { this.result = []; }
+                    else
+                    {
+                        const files = fs.readdirSync(resolvedPath);
+                        const filter = /\.component\.html$/; 
+                        const file = files.find(file => filter.test(file)); 
+                        // Found a component    
+                        if (file) 
+                        {
+                            const fullPath = path.join(resolvedPath, file);
+                            const text_file = fs.readFileSync(fullPath, 'utf8');
+                            console.log(`Content of ${file}:`, text_file);
+                        }
+                    }
+                    
                 })
                 .catch((error) => {
                     reject(error); // Propagate error to the caller
                 });
+            }
+            
         });
     }
 
-    private read_file(filePath: string): Promise<void> 
+    private read_file(filePath: string): Promise<string> 
     {
-        return new Promise<void>((resolve, reject) =>
+        return new Promise<string>((resolve, reject) => 
         {
-            fs.readFile(filePath, { encoding: 'utf-8' })
-            .then((data) => 
+            fs.readFile(filePath, { encoding: 'utf-8' }, (error, data) => 
             {
-                this.fileToParse = data;
-                resolve();
-            })
-            .catch((error) => 
-            {
-                this.fileToParse = '';
-                console.error('Failed to read file:', error);
-                reject(error); // Propagate error to the caller
+                if (error) {
+                    this.fileToParse = '';
+                    console.error('Failed to read file:', error);
+                    reject(error); 
+                } else {
+                    this.fileContents = data;
+                    resolve(data); 
+                }
             });
         });
     }

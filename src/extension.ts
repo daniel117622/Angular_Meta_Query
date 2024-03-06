@@ -17,6 +17,7 @@ export function activate(context: vscode.ExtensionContext)
     let command1 = vscode.commands.registerCommand('extension.showToast', () => 
 	{
         const sp : StyleParserCommand = new StyleParserCommand(testPath);
+        
         sp.execute()
         .then((res : StyleAssociation[]) => 
         {
