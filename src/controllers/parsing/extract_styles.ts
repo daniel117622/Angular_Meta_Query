@@ -1,7 +1,8 @@
 import { StyleAssociation, StyleObject } from "../../models/StyleAssociation";
 import { WorkspaceFolder, workspace } from "vscode";
-import * as path from 'path';
-import * as fs from 'fs';
+import * as vscode from 'vscode';
+
+const cheerio = require('cheerio');
 
 interface ICommand 
 {
@@ -11,65 +12,48 @@ interface ICommand
 export class StyleParserCommand implements ICommand
 {
     private result? : StyleAssociation[];
-    private fileToParse?: string;
-    private fileContents?: string;
+    public fileContents?: string;
 
-    constructor(private filePath: string) 
-    {
-        this.fileToParse = filePath;
-    }
+    constructor() {}
 
     public execute(): Promise<StyleAssociation[]> 
     {
         return new Promise<StyleAssociation[]>((resolve, reject) => 
         {
-            let active_folder: WorkspaceFolder | undefined = workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined;
-            if (active_folder)
+            try
             {
-                let resolvedPath = path.resolve(active_folder.uri.fsPath);
-                this.read_file(resolvedPath || 'no file')
-                .then(() => 
+                let active_editor : vscode.TextEditor | undefined = vscode.window.activeTextEditor; 
+                if (!active_editor) 
+                { resolve([]) ; return; }
+                if (active_editor)
                 {
-                    let text_file : string;
-                    if (!fs.existsSync(resolvedPath)) { this.result = []; }
+                    this.fileContents = active_editor.document.getText();
+                    let thisFileName = active_editor.document.fileName.split('\\').pop();
+                    if (/.*\.component\.html$/.test(thisFileName || '')) 
+                    {
+                        const $ = cheerio.load(this.fileContents);
+                        const stylesAssociations: StyleAssociation[] = [];
+                        $('*[style]').each((i : any, elem : any) => {
+                            const element = $(elem).parent()[0].name;
+                            const styleContent = $(elem).html();
+                            const styleObjects: StyleObject[] = styleContent.split(';').filter((style:string) => style.trim() !== '').map((style : string) => {
+                                const [key, value] = style.split(':').map((s : string) => s.trim());
+                                return { key, value };
+                            });
+                            stylesAssociations.push({ element, tags: styleObjects });
+                        });
+                        resolve(stylesAssociations);
+                    }
                     else
                     {
-                        const files = fs.readdirSync(resolvedPath);
-                        const filter = /\.component\.html$/; 
-                        const file = files.find(file => filter.test(file)); 
-                        // Found a component    
-                        if (file) 
-                        {
-                            const fullPath = path.join(resolvedPath, file);
-                            const text_file = fs.readFileSync(fullPath, 'utf8');
-                            console.log(`Content of ${file}:`, text_file);
-                        }
+                        resolve([]);
+                        return;
                     }
-                    
-                })
-                .catch((error) => {
-                    reject(error); // Propagate error to the caller
-                });
-            }
+                }
             
+            } catch(error) { console.error(error) ; resolve([]); }            
         });
     }
 
-    private read_file(filePath: string): Promise<string> 
-    {
-        return new Promise<string>((resolve, reject) => 
-        {
-            fs.readFile(filePath, { encoding: 'utf-8' }, (error, data) => 
-            {
-                if (error) {
-                    this.fileToParse = '';
-                    console.error('Failed to read file:', error);
-                    reject(error); 
-                } else {
-                    this.fileContents = data;
-                    resolve(data); 
-                }
-            });
-        });
-    }
+
 }
