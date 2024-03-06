@@ -34,12 +34,12 @@ export class StyleParserCommand implements ICommand
                         const $ = cheerio.load(this.fileContents);
                         const stylesAssociations: StyleAssociation[] = [];
                         $('*[style]').each((i : any, elem : any) => {
-                            const element = $(elem).parent()[0].name;
-                            const styleContent = $(elem).html();
-                            const styleObjects: StyleObject[] = styleContent.split(';').filter((style:string) => style.trim() !== '').map((style : string) => {
-                                const [key, value] = style.split(':').map((s : string) => s.trim());
+                            const element = elem.tagName.toLowerCase();
+                            const styleContent = $(elem).attr('style');
+                            const styleObjects: StyleObject[] = styleContent?.split(';').filter((style: string) => style.trim() !== '').map((style: string) => {
+                                const [key, value] = style.split(':').map((s: string) => s.trim());
                                 return { key, value };
-                            });
+                            }) || [];
                             stylesAssociations.push({ element, tags: styleObjects });
                         });
                         resolve(stylesAssociations);

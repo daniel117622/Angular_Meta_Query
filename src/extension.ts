@@ -20,13 +20,17 @@ export function activate(context: vscode.ExtensionContext)
         sp.execute()
         .then((res : StyleAssociation[]) => 
         {
-            showToast(JSON.stringify(res, null ,2) || 'none');
+            db.insertStyleAssociations(res)
+            .then(() => {showToast("Succesfully uploaded styles");})
+            .catch((err: Error) => {showToast(err.message);});
+            
         });
 
     });
     
 
     context.subscriptions.push(command1);
+    
 }
 
 export function deactivate() {}
