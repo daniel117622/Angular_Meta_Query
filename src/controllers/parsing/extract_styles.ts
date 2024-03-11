@@ -1,8 +1,9 @@
 import { StyleAssociation, StyleObject } from "../../models/StyleAssociation";
 import { WorkspaceFolder, workspace } from "vscode";
+import * as cheerio from 'cheerio';
 import * as vscode from 'vscode';
 
-const cheerio = require('cheerio');
+
 
 interface ICommand 
 {

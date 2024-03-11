@@ -20,7 +20,7 @@ export function activate(context: vscode.ExtensionContext)
         sp.execute()
         .then((res : StyleAssociation[]) => 
         {
-            db.insertStyleAssociations(res)
+            db.insertStyleAssociations(res) // 
             .then(() => {showToast("Succesfully uploaded styles");})
             .catch((err: Error) => {showToast(err.message);});
             

@@ -2,9 +2,10 @@
 
 import { StyleAssociation } from "../../models/StyleAssociation";
 
+
 interface ICommand 
 {
-    execute() : Promise<void> // Doesnt return, just might fail whether or not it does the source manipulation 
+    execute() : Promise<string> // Returns the string to be appended at component.scss
 }
 
 export class StylesTransform
