@@ -51,6 +51,17 @@ else:
     print("Local copy exists.")
 
 
+repo_refs = []
+id = 0
+
 for repo in data["items"]:
    if is_angular_project(repo["html_url"]):
-       print(repo["html_url"])
+       link = repo["html_url"]
+       id = id + 1
+       repo_refs.append({"id": id ,"link":link})
+
+will_save = {"data": repo_refs }
+os.makedirs("./data", exist_ok=True)
+
+with open("./data/angularRepos.json", 'w') as file:
+    json.dump(will_save, file, indent=4)
