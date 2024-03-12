@@ -1,3 +1,15 @@
+## Why work in this extension?
+  -- Frontend applications can grow so complex to the point that is hard to make changes. While there is software that allows you to view your dependencies chains, your code-smells and other statistics like that
+  they are annoying or slow to work with, and I guess most people who work on their projects have a mental image on how the dataflows are ocurring in this application. Instead of going to those code analyzers and 
+  mess around with those slow and confusing interfaces ( sonarcloud ). Why not just type something like:
+    "/select inline_styles from blog.component.html => moveIntoCSSClass => blog.component.scss" : Effectively move your inlined styles into stylesheets as it should be. Performs aggrupation and uses the most appropiate selector automatically
+    "/select input from blog.component.ts where input='someField' into X => move X into register.component.ts : Removes that field from the @Input and removes the bindings associated with it
+
+  This are some examples, but well the extensions aims at providing queries that could help developers to code and refactor faster. Yes there are tools for that, but wouldn't it be cool something quick and intuitive to use?
+  Think about this as a find and replace on steroids extension!
+
+  
+
 ## Secrets : 
 Currently you need to implement a class to point to your desired mongo URL.
 For some reason extensions enviroment is tricky
