@@ -1,5 +1,9 @@
 import requests
 import json
+from dotenv import load_dotenv
+import os
+load_dotenv()
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 with open("./data/angularRepos.json", 'r') as f:
     file = json.load(f)
@@ -8,7 +12,7 @@ headers = {}
 
 def search_files_in_repo(page_idx):
     headers = {
-        
+        "Authorization" : f"BEARER {GITHUB_TOKEN}",
         "Accept" : "application/vnd.github.v3+json"
     }
     search_url = f"https://api.github.com/search/code?q=extension:component.html&per_page=100&page={page_idx}"
@@ -23,6 +27,7 @@ def convert_to_raw_github_url(url):
     raw_url = raw_url.replace("/blob", "")
     return raw_url
 
+print(GITHUB_TOKEN)
 raw_urls = []
 for page_idx in range(0,10):
     print(f"Page : {page_idx}")
