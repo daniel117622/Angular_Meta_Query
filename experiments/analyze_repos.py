@@ -27,7 +27,6 @@ def convert_to_raw_github_url(url):
     raw_url = raw_url.replace("/blob", "")
     return raw_url
 
-print(GITHUB_TOKEN)
 raw_urls = []
 for page_idx in range(0,10):
     print(f"Page : {page_idx}")
@@ -42,3 +41,4 @@ for page_idx in range(0,10):
     # Save the raw URLs to a JSON file
 with open('file_references.json', 'w') as json_file:
     json.dump(raw_urls, json_file, indent=4)
+
