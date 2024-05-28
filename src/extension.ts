@@ -10,9 +10,10 @@ import { StyleAssociation } from './models/StyleAssociation';
 
 export function activate(context: vscode.ExtensionContext) 
 {
-
+    /*
 	let db = new DataHelper(Secrets.getMongoURL());
-    
+    */ 
+   
     let command1 = vscode.commands.registerCommand('extension.showToast', () => 
 	{
         const sp : StyleParserCommand = new StyleParserCommand();
@@ -20,11 +21,10 @@ export function activate(context: vscode.ExtensionContext)
         sp.execute()
         .then((res : StyleAssociation[]) => 
         {
-            db.insertStyleAssociations(res) // 
-            .then(() => {showToast("Succesfully uploaded styles");})
-            .catch((err: Error) => {showToast(err.message);});
-            
+            showToast(JSON.stringify(res,null,2));
+            console.log(JSON.stringify(res,null,2));
         });
+        console.log("Command run");
 
     });
     
