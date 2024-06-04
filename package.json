@@ -15,9 +15,10 @@
     "commands": [
       {
         "command": "extension.showToast",
-        "title": "Show Toast Message"
+        "title": "Obtain styles"
       }
     ]
+    
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
